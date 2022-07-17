@@ -1,12 +1,18 @@
 const Router = require('koa-router')
 
-const { useValidator, verifyUser } = require('../middleware/use.middleware')
+const { useValidator, verifyUser, encryptionPassword, verifyLogin } = require('../middleware/use.middleware')
 
-const { register} = require('../controller/user.controller')
+const { auth } = require('../middleware/auth.middleware')
 
-const router = new Router({prefix: '/user'})
+const { register, login, updataPaw} = require('../controller/user.controller')
 
-router.post('/', useValidator, verifyUser, register)
+const router = new Router()
+
+router.post('/', useValidator, verifyUser, encryptionPassword, register)
+
+router.post('/login', useValidator, verifyLogin, login)
+
+router.patch('/updataPassword',auth, updataPaw)
 
 
 module.exports = router

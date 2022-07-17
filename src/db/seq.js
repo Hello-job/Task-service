@@ -14,7 +14,7 @@ const seq = new Sequelize(MYSQL_DB, MYSQL_USER, MYSQL_PWD, {
   })
 
   seq.authenticate().then((res) => {
-    console.log('>>>>>>成功映入')
+    console.log('>>>>>>数据库链接成功')
   }).catch((err) => {
     console.log('>>>>>err', err)
   })
