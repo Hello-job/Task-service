@@ -1,14 +1,28 @@
-const Koa = require('koa')
-const app = new Koa()
-const koaBody = require('koa-body');
+const path = require("path");
 
-const errHandle = require('./errHandler')
+const Koa = require("koa");
+const app = new Koa();
+const koaBody = require("koa-body");
+const koaStatic = require("koa-static");
+const koaParameter = require("koa-parameter");
 
-const userRouter = require('../router/user.router')
+const errHandle = require("./errHandler");
 
-app.use(koaBody());
+const router = require("../router");
 
-app.use(userRouter.routes())
-app.on('error', errHandle)
+app.use(
+  koaBody({
+    multipart: true,
+    formidable: {
+      uploadDir: path.join(__dirname, "/uoload"),
+      keepExtensions: true,
+    },
+  })
+);
 
-module.exports = app
+app.use(koaStatic(path.join(__dirname, "/uoload")));
+app.use(koaParameter(app));
+app.use(router.routes()).use(router.allowedMethods());
+app.on("error", errHandle);
+
+module.exports = app;
