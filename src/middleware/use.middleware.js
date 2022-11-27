@@ -26,7 +26,7 @@ const verifyUser = async (ctx, next) => {
   const { user_name, password } = ctx.request.body;
   // 合法性
   if (await getUserInfo({ user_name })) {
-    ctx.status = 409;
+    ctx.status = 500;
     ctx.app.emit("error", userAlreadyExited, ctx);
     return;
   }

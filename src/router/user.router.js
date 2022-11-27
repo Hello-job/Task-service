@@ -13,7 +13,13 @@ const { register, login, updataPaw } = require("../controller/user.controller");
 
 const router = new Router();
 
-router.post("/", useValidator, verifyUser, encryptionPassword, register);
+router.post(
+  "/register",
+  useValidator,
+  verifyUser,
+  encryptionPassword,
+  register
+);
 
 router.post("/login", useValidator, verifyLogin, login);
 

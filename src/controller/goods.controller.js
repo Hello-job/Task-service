@@ -1,12 +1,16 @@
 const path = require("path");
 
-const { createGoods, updataGoods } = require("../service/goods.service");
+const {
+  createGoods,
+  updataGoods,
+  removeGoods,
+  findAllGoods,
+} = require("../service/goods.service");
 const { uploadError, createGoodsError } = require("../constant/goods.constant");
 
 class GoodsController {
   async upload(ctx, next) {
-    const file = ctx.request.files;
-    console.log("filefile", file);
+    const { file } = ctx.request.files;
     if (file) {
       ctx.body = {
         code: 0,
@@ -19,7 +23,6 @@ class GoodsController {
       ctx.app.emit("error", uploadError, ctx);
       return;
     }
-    next();
   }
 
   async create(ctx, next) {
@@ -34,14 +37,18 @@ class GoodsController {
       if (res) {
         ctx.body = {
           code: 0,
-          message: "添加商品成功",
-          result: res,
+          message: "上传图片成功",
+          result: {
+            goods_path: path.basename(file.name),
+          },
         };
+      } else {
+        ctx.app.emit("error", uploadError, ctx);
+        return;
       }
     } catch (err) {
       return ctx.app.emit("error", createGoodsError, ctx);
     }
-    next();
   }
 
   async updata(ctx, next) {
@@ -55,7 +62,45 @@ class GoodsController {
         };
       }
     } catch (err) {}
-    next();
+  }
+
+  async remove(ctx, next) {
+    try {
+      const res = await removeGoods(ctx.params.id);
+
+      if (res) {
+        ctx.body = {
+          code: 0,
+          message: "下架商品成功",
+          result: "",
+        };
+      } else {
+        ctx.body = {
+          code: 0,
+          message: "该商品已经下架",
+          result: "",
+        };
+      }
+    } catch (err) {
+      console.log(">>>>err", err);
+    }
+  }
+
+  async findAll(ctx, next) {
+    try {
+      const { pageNum = 1, pageSize = 10 } = ctx.request.query;
+
+      const res = await findAllGoods(pageNum, pageSize);
+      if (res) {
+        ctx.body = {
+          code: 0,
+          message: "获取商品成功",
+          result: res,
+        };
+      }
+    } catch (err) {
+      console.log(">>>>>err", err);
+    }
   }
 }
 

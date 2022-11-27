@@ -19,4 +19,9 @@ module.exports = {
     message: "创建商品错误",
     result: "",
   },
+  cartsError: {
+    code: "10301",
+    message: "加入购物车错误",
+    result: "",
+  },
 };
