@@ -1,17 +1,17 @@
-const { cartsError } = require("../constant/goods.constant");
-const validator = (rulse) => {
+const { cartsError } = require('../constant/goods.constant')
+const validator = rulse => {
   return (ctx, next) => {
     try {
-      ctx.verifyParams(rulse);
+      ctx.verifyParams(rulse)
     } catch (err) {
-      console.error(">>>>>err", err);
-      cartsError.result = err;
-      return ctx.app.emit("error", cartsError, ctx);
+      console.error('>>>>>err', err)
+      cartsError.result = err
+      return ctx.app.emit('error', cartsError, ctx)
     }
-    next();
-  };
-};
+    next()
+  }
+}
 
 module.exports = {
-  validator,
-};
+  validator
+}
