@@ -1,4 +1,4 @@
-const User = require('../module/use.module')
+const User = require('../module/user.module')
 class UserService {
   async createUser(user_name, password) {
     try {

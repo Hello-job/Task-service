@@ -1,17 +1,24 @@
 const { Op } = require('sequelize')
 const Project = require('../module/project.module')
+const User = require('../module/user.module')
 const {
   createProjectMember,
   getMemberProjecs
-} = require('./project_member.service')
+} = require('./projectMember.service')
 
 class ProjectService {
+    /**
+     * 创建项目
+     * @param {参} params 
+     * @returns 
+     */
   async createProejct(params) {
     try {
-      const { name, project_img = '', creator, desc = '' } = params
+      const { name, projectImg = '', creator, desc = '' } = params
+
       const res = await Project.create({
         name,
-        project_img,
+        projectImg,
         creator,
         desc
       })
@@ -19,9 +26,15 @@ class ProjectService {
         projectId: res.id,
         memberId: creator
       })
-      return res
-    } catch (err) {}
+      return res.dataValues;
+    } catch (err) {
+    }
   }
+  /**
+   * 删除项目
+   * @param {*} params 
+   * @returns 
+   */
   async deleteProject(params) {
     try {
       const { id } = params
@@ -33,6 +46,11 @@ class ProjectService {
       return res
     } catch (err) {}
   }
+  /**
+   * 更新项目
+   * @param {*} params 
+   * @returns 
+   */
   async updateProject(params) {
     try {
       const { id, ...other } = params
@@ -49,20 +67,32 @@ class ProjectService {
       return err
     }
   }
-  async projectList(params) {
+  /**
+   * 获取项目
+   * @param {*} params 
+   * @returns 
+   */
+  async getprojectList(params) {
     try {
-      const { id } = parmas
-      let attrbutes = ['name', 'project_img', 'creator', 'desc']
+      const { userId } = params
       const projectIds = await getMemberProjecs({
-        id
+        id: userId
       })
-      const res = await Project.findAll({
-        attrbutes,
-        where: {
-          id: projectIds
-        }
-      })
-      return res
+      if (projectIds.length > 0) {
+        const res = await Project.findAll({
+            where: {
+              id: projectIds
+            },
+            include: [{
+                model: User,
+                as: 'creatorInfo',
+                attributes: ['id', 'avatar', 'createdAt', 'updatedAt', 'user_name']
+            }]
+        })
+        const dataList = res.map(item => item.dataValues)
+        return dataList
+      }
+
     } catch (err) {}
   }
 }

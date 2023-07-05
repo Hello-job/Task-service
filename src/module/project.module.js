@@ -1,9 +1,11 @@
 const { DataTypes } = require('sequelize')
 
+const User = require('./user.module')
+
 const seq = require('../db/seq')
 
 // 创建数据表模型
-const Project = seq.define('project', {
+const Project = seq.define('projects', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -20,7 +22,7 @@ const Project = seq.define('project', {
     allowNull: false,
     comment: '创建人'
   },
-  project_img: {
+  projectImg: {
     type: DataTypes.STRING,
     allowNull: false,
     comment: '项目封面'
@@ -33,5 +35,7 @@ const Project = seq.define('project', {
 })
 
 // Project.sync({ alter: true })
+
+Project.belongsTo(User, { foreignKey: 'creator', as: 'creatorInfo' })
 
 module.exports = Project

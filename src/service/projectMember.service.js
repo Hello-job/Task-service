@@ -1,12 +1,12 @@
-const ProjectMember = require('../module/project_member.module')
+const ProjectMember = require('../module/projectMember.module')
 
 class ProjectMemberServicer {
   async createProjectMember(parmas) {
     try {
       const { projectId, memberId } = parmas
       const res = await ProjectMember.create({
-        project_id: projectId,
-        member_id: memberId
+        projectId: projectId,
+        memberId: memberId
       })
       return res
     } catch (err) {}
@@ -15,12 +15,14 @@ class ProjectMemberServicer {
     try {
       const { id } = params
       const res = await ProjectMember.findAll({
-        attrbutes: ['project_id'],
         where: {
-          member_id: id
+          memberId: id
         }
       })
-      return res
+      if(res.length > 0) {
+        return res.map(item => item.dataValues.id)
+      } 
+      return [];
     } catch (err) {
       return err
     }
