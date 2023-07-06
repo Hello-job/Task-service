@@ -1,48 +1,49 @@
-const User = require('../module/user.module')
+const User = require("../module/user.module");
 class UserService {
-  async createUser(user_name, password) {
+  async createUser(name, password) {
     try {
-      const res = await User.create({ user_name, password })
-      return res.dataValues
+      const res = await User.create({ name, password });
+      return res.dataValues;
     } catch (err) {}
   }
-  async getUserInfo({ id, user_name, password, is_admin, type }) {
-    const whereOpt = {}
-    id && Object.assign(whereOpt, { id })
-    user_name && Object.assign(whereOpt, { user_name })
-    password && Object.assign(whereOpt, { password })
-    is_admin && Object.assign(whereOpt, { is_admin })
-    let attributes = [
-      'id',
-      'user_name',
-      'password',
-      'is_admin',
-      'avatar',
-      'createdAt',
-      'updatedAt'
-    ]
-    if (type === 'get') {
-      attributes = attributes.filter(key => key !== 'password')
-    }
-    const res = await User.findOne({
-      attributes,
-      where: whereOpt
-    })
-    return res ? res.dataValues : null
+
+  /**
+   *
+   * @param {getType} param 验证token需要 password
+   * @returns
+   */
+  async getUserInfo({ id, name, getType }) {
+    try {
+      const whereOpt = {};
+      id && Object.assign(whereOpt, { id });
+      name && Object.assign(whereOpt, { name });
+
+      const exclude = getType ? [] : ["password"];
+      const res = await User.findOne({
+        attributes: {
+          exclude,
+        },
+        where: whereOpt,
+      });
+      return res ? res.dataValues : null;
+    } catch (err) {}
   }
 
-  async updataUserinfo({ id, user_name, password, is_admin, avatar }) {
+  async updataUserinfo({ id, ...updataFields }) {
     try {
-      const whereOpt = { id }
-      const newOpt = {}
-      user_name && Object.assign(newOpt, { user_name })
-      password && Object.assign(newOpt, { password })
-      is_admin && Object.assign(newOpt, { is_admin })
-      avatar && Object.assign(newOpt, { avatar })
-      const res = await User.update(newOpt, {
-        where: whereOpt
-      })
-      return res
+      const whereOpt = { id };
+      const [record] = await User.update(updataFields, {
+        where: whereOpt,
+      });
+
+      const updateInfo = await User.findOne({
+        where: whereOpt,
+        attributes: {
+          exclude: ["password"],
+        },
+      });
+
+      return updateInfo.dataValues;
     } catch (err) {}
   }
 
@@ -51,22 +52,11 @@ class UserService {
    *
    */
   async userAll() {
-    console.log('res')
-
-    let attributes = [
-      'id',
-      'user_name',
-      'is_admin',
-      'avatar',
-      'createdAt',
-      'updatedAt'
-    ]
-
     const res = await User.findAll({
-      attributes
-    })
-    return res
+      attributes: { exclude: ["password"] },
+    });
+    return res;
   }
 }
 
-module.exports = new UserService()
+module.exports = new UserService();

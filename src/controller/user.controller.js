@@ -2,47 +2,46 @@ const {
   createUser,
   getUserInfo,
   updataUserinfo,
-  userAll
-} = require('../service/user.service')
+  userAll,
+} = require("../service/user.service");
 
-const { userRequestErr, updataPswErr } = require('../constant/use.constant')
+const { userRequestErr, updataPswErr } = require("../constant/use.constant");
 
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
-const { JWT_SECRET } = require('../config/config.defaule')
+const { JWT_SECRET } = require("../config/config.defaule");
 class UserController {
   async register(ctx, next) {
-    const { user_name, password } = ctx.request.body
-
+    const { name, password } = ctx.request.body;
     try {
-      const res = await createUser(user_name, password)
+      const res = await createUser(name, password);
       ctx.body = {
         code: 0,
-        message: '注册成功',
+        message: "注册成功",
         result: {
           id: res.id,
-          user_name: res.user_name
-        }
-      }
+          name: res.name,
+        },
+      };
     } catch (err) {
-      ctx.app.emit('error', userRequestErr, ctx)
-      return
+      ctx.app.emit("error", userRequestErr, ctx);
+      return;
     }
   }
 
   async login(ctx, next) {
-    const { user_name } = ctx.request.body
+    const { name } = ctx.request.body;
 
     try {
-      const { password, ...res } = await getUserInfo({ user_name })
+      const { password, ...res } = await getUserInfo({ name });
       ctx.body = {
         code: 0,
-        message: '用户登陆成功',
+        message: "用户登陆成功",
         result: {
-          token: jwt.sign(res, JWT_SECRET, { expiresIn: '1d' }),
-          userInfo: { ...res }
-        }
-      }
+          token: jwt.sign(res, JWT_SECRET, { expiresIn: "1d" }),
+          userInfo: { ...res },
+        },
+      };
     } catch (err) {}
   }
 
@@ -53,52 +52,55 @@ class UserController {
    * @returns
    */
   async userInfo(ctx, next) {
-    const { id } = ctx.request.query
-    const user = await getUserInfo({ id, type: 'get' })
+    const { id } = ctx.request.query;
+    const user = await getUserInfo({ id, type: "get" });
 
     if (user) {
       ctx.body = {
         code: 0,
-        message: '',
+        message: "",
         result: {
-          user
-        }
-      }
+          user,
+        },
+      };
     }
   }
 
   async updataPaw(ctx, next) {
-    const { password, id } = ctx.request.body
+    const { password, id } = ctx.request.body;
 
     try {
-      const res = await updataUserinfo({ id, password })
+      const res = await updataUserinfo({ id, password });
       if (!res) {
         ctx.body = {
           code: 0,
-          message: '修改密码成功',
-          result: ''
-        }
+          message: "修改密码成功",
+          result: "",
+        };
       }
     } catch (err) {
-      ctx.app.emit('error', updataPswErr, ctx)
-      return
+      ctx.app.emit("error", updataPswErr, ctx);
+      return;
     }
   }
 
   async upUserInfo(ctx, next) {
-    const updateInfo = ctx.request.body
+    const updateInfo = ctx.request.body;
     try {
-      const res = await updataUserinfo(updateInfo)
+      const res = await updataUserinfo({
+        ...updateInfo,
+        id: ctx.state.user.id,
+      });
       if (res) {
         ctx.body = {
           code: 0,
-          message: '修改信息成功',
-          result: ''
-        }
+          message: "修改信息成功",
+          result: res,
+        };
       }
     } catch (err) {
-      ctx.app.emit('error', updataPswErr, ctx)
-      return
+      ctx.app.emit("error", updataPswErr, ctx);
+      return;
     }
   }
 
@@ -106,15 +108,15 @@ class UserController {
    * 获取全部用户
    */
   async getUserAll(ctx, next) {
-    const res = await userAll()
+    const res = await userAll();
     ctx.body = {
       code: 0,
-      message: '',
+      message: "",
       result: {
-        userList: res
-      }
-    }
+        userList: res,
+      },
+    };
   }
 }
 
-module.exports = new UserController()
+module.exports = new UserController();

@@ -4,7 +4,6 @@ const validator = (rulse) => {
     try {
       ctx.verifyParams(rulse);
     } catch (err) {
-      console.error(">>>>>err", err);
       cartsError.result = err;
       return ctx.app.emit("error", cartsError, ctx);
     }
